@@ -10,4 +10,4 @@ pub use derives::*;
 pub use traits::*;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
-pub struct TryEnumFromByteError(pub ());
+pub struct TryEnumFromByteError(pub u8);

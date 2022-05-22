@@ -84,7 +84,7 @@ fn generate_output(name: Ident, variants: Vec<Ident>) -> TokenStream {
     let try_from_u8 = generate_try_from_u8(&name, &variants);
 
     return quote! {
-        impl ByteEnum for #name {}
+        impl ::byte_enum::ByteEnum for #name {}
         #into_u8
         #try_from_u8
     }
@@ -94,7 +94,7 @@ fn generate_output(name: Ident, variants: Vec<Ident>) -> TokenStream {
 fn generate_into_u8(name: &Ident, variants: &Vec<Ident>) -> TokenStream2 {
     let index = 0_u8..variants.len() as u8;
     return quote! {
-        impl From<#name> for u8 {
+        impl ::std::convert::From<#name> for u8 {
             #[inline(always)]
             fn from(value: #name) -> Self {
                 return match value {
@@ -108,14 +108,14 @@ fn generate_into_u8(name: &Ident, variants: &Vec<Ident>) -> TokenStream2 {
 fn generate_try_from_u8(name: &Ident, variants: &Vec<Ident>) -> TokenStream2 {
     let index = 0_u8..variants.len() as u8;
     return quote! {
-        impl TryFrom<u8> for #name {
-            type Error = TryEnumFromByteError;
+        impl ::std::convert::TryFrom<u8> for #name {
+            type Error = ::byte_enum::TryEnumFromByteError;
 
             #[inline(always)]
             fn try_from(value: u8) -> Result<Self, Self::Error> {
                 return match value {
                     #( #index => { Ok(#name::#variants) }, )*
-                    _ => Err(TryEnumFromByteError(())),
+                    _ => Err(::byte_enum::TryEnumFromByteError(value)),
                 };
             }
         }
