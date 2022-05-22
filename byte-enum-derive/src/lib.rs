@@ -84,7 +84,7 @@ fn generate_output(name: Ident, variants: Vec<Ident>) -> TokenStream {
     let try_from_u8 = generate_try_from_u8(&name, &variants);
 
     return quote! {
-        impl ::byte_enum::ByteEnum for #name {}
+        impl ::byte_enum::IsByteEnum for #name {}
         #into_u8
         #try_from_u8
     }

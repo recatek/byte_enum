@@ -1,5 +1,5 @@
 pub mod traits {
-    pub trait ByteEnum: Into<u8> + TryFrom<u8> {}
+    pub trait IsByteEnum: Into<u8> + TryFrom<u8> {}
 }
 
 pub mod derives {
