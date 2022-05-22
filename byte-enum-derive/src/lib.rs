@@ -1,3 +1,6 @@
+#![cfg_attr(feature = "external_doc", feature(external_doc))]
+#![cfg_attr(feature = "external_doc", doc(include = "../README.md"))]
+
 #![deny(clippy::implicit_return)]
 #![allow(clippy::needless_return)]
 #![allow(clippy::bool_comparison)]
@@ -9,8 +12,11 @@ use syn::{
     parse_macro_input, Attribute, Data, DataEnum, DeriveInput, Ident, Meta, NestedMeta, Variant,
 };
 
+/// Implements `Into<u8>` (via `From<>`) and `TryFrom<u8>` for a `#[repr(u8)]` enum.
+///
+/// The enum must be `#[repr(u8)]`, fieldless, and may not have explicit discriminants.
 #[proc_macro_derive(ByteEnum)]
-pub fn describe(input: TokenStream) -> TokenStream {
+pub fn derive_byte_enum(input: TokenStream) -> TokenStream {
     let input: DeriveInput = parse_macro_input!(input);
     match parse_enum_contents(&input) {
         Err(err) => {
@@ -30,7 +36,10 @@ fn parse_enum_contents(input: &DeriveInput) -> Result<Vec<Ident>, syn::Error> {
 fn parse_variants(input: &DeriveInput) -> Result<Vec<Ident>, syn::Error> {
     let mut idents: Vec<Ident> = Vec::new();
     if let Data::Enum(DataEnum { variants, .. }) = &input.data {
-        if variants.len() > 255 {
+        if variants.is_empty() {
+            return Err(error_no_variants());
+        }
+        if variants.len() > 256 {
             return Err(error_too_many_variants());
         }
         for variant in variants.iter() {
@@ -80,21 +89,21 @@ fn check_variant(variant: &Variant) -> Result<(), syn::Error> {
 }
 
 fn generate_output(name: Ident, variants: Vec<Ident>) -> TokenStream {
-    let into_u8 = generate_into_u8(&name, &variants);
+    let into_u8 = generate_u8_from(&name, &variants);
     let try_from_u8 = generate_try_from_u8(&name, &variants);
 
     return quote! {
-        impl ::byte_enum::IsByteEnum for #name {}
+        impl ::byte_enum::ByteEnum for #name {}
         #into_u8
         #try_from_u8
     }
     .into();
 }
 
-fn generate_into_u8(name: &Ident, variants: &Vec<Ident>) -> TokenStream2 {
-    let index = 0_u8..variants.len() as u8;
+fn generate_u8_from(name: &Ident, variants: &Vec<Ident>) -> TokenStream2 {
+    let index = 0_u8..=(variants.len() - 1) as u8;
     return quote! {
-        impl ::std::convert::From<#name> for u8 {
+        impl ::core::convert::From<#name> for u8 {
             #[inline(always)]
             fn from(value: #name) -> Self {
                 return match value {
@@ -106,9 +115,9 @@ fn generate_into_u8(name: &Ident, variants: &Vec<Ident>) -> TokenStream2 {
 }
 
 fn generate_try_from_u8(name: &Ident, variants: &Vec<Ident>) -> TokenStream2 {
-    let index = 0_u8..variants.len() as u8;
+    let index = 0_u8..=(variants.len() - 1) as u8;
     return quote! {
-        impl ::std::convert::TryFrom<u8> for #name {
+        impl ::core::convert::TryFrom<u8> for #name {
             type Error = ::byte_enum::TryEnumFromByteError;
 
             #[inline(always)]
@@ -148,6 +157,11 @@ declare_error!(
 declare_error!(
     error_must_be_enum,
     "#[derive(ByteEnum)] must be applied only to enum types"
+);
+
+declare_error!(
+    error_no_variants,
+    "#[derive(ByteEnum)] must have at least one variant"
 );
 
 declare_error!(
