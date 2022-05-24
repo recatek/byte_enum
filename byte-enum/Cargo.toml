@@ -14,4 +14,4 @@ external_doc = []
 features = ["external_doc"]
 
 [dependencies]
-byte-enum-derive = { path = "../byte-enum-derive" }
+byte-enum-derive = { version = "0.1.0", path = "../byte-enum-derive" }
