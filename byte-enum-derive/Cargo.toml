@@ -1,7 +1,7 @@
 [package]
 name = "byte-enum-derive"
 description = "A derive macro for converting #[repr(u8)] enums to bytes and back."
-readme = "README.md"
+readme = "../README.md"
 version = "0.1.0"
 edition = "2021"
 repository = "https://github.com/recatek/byte-enum"
