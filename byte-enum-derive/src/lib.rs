@@ -1,6 +1,3 @@
-#![cfg_attr(feature = "external_doc", feature(external_doc))]
-#![cfg_attr(feature = "external_doc", doc(include = "../README.md"))]
-
 #![deny(clippy::implicit_return)]
 #![allow(clippy::needless_return)]
 #![allow(clippy::bool_comparison)]
