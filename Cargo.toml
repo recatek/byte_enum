@@ -9,4 +9,4 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [dependencies]
-byte_enum_derive = { path = "byte_enum_derive" }
+byte_enum_derive = { version = "0.2.0", path = "byte_enum_derive" }
