@@ -5,16 +5,14 @@
 use proc_macro::{self, TokenStream};
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::quote;
-use syn::{
-    parse_macro_input, Attribute, Data, DataEnum, DeriveInput, Ident, Meta, NestedMeta, Variant,
-};
+use syn::{Attribute, Data, DataEnum, DeriveInput, Ident, Meta, NestedMeta, Variant};
 
 /// Implements `Into<u8>` (via `From<>`) and `TryFrom<u8>` for a `#[repr(u8)]` enum.
 ///
 /// The enum must be `#[repr(u8)]`, fieldless, and may not have explicit discriminants.
 #[proc_macro_derive(ByteEnum)]
 pub fn derive_byte_enum(input: TokenStream) -> TokenStream {
-    let input: DeriveInput = parse_macro_input!(input);
+    let input: DeriveInput = syn::parse_macro_input!(input);
     match parse_enum_contents(&input) {
         Err(err) => {
             return err.to_compile_error().into();

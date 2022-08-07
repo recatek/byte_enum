@@ -1,4 +1,4 @@
-# byte-enum
+# byte_enum
 
 A `ByteEnum` derive macro and trait to implement `Into<u8>` and `TryFrom<u8>` for a `#[repr(u8)]` enum. Simple as.
 
@@ -30,4 +30,4 @@ assert!(d.is_err());
 License
 -------
 
-byte-enum may be used under your choice of the Apache 2 or MIT license.
+byte_enum may be used under your choice of the Apache 2.0 or MIT license.
